@@ -1,0 +1,5 @@
+## Emotion-Song Mapping 🎵
+- **Happy** 😊 → 🎶 [Song Link](https://www.youtube.com/watch?v=iiBu2aGWlcg)
+- **Sad** 😢 → 🎶 [Song Link](https://www.youtube.com/watch?v=7KuphVb3neA)
+- **Fear** 😨 → 🎶 [Song Link](https://www.youtube.com/watch?v=g44VQxMcFH4)
+- **Neutral** 😐 → 🎶 [Song Link](https://www.youtube.com/watch?v=HZ_Q20ir-gg)

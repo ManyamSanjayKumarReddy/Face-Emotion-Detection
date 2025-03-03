@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #FFCDC5, #14281D);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            width: 80%;
+            height: 80vh;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            gap: 20px;
+        }
+        .left {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .video-container {
+            border: 2px solid white;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        .right {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+        }
+        .emotion-box {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .song-box {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .control-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .control-button:hover {
+            background-color: darkred;
+        }
+        audio {
+            margin-top: 10px;
+            width: 80%;
+        }
+        h1 {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <div class="video-container">
+                <img id="video-feed" src="{{ url_for('video_feed') }}" width="100%" height="100%">
+            </div>
+        </div>
+        <div class="right">
+            <h1>Real-Time Emotion Detection</h1>
+            <div class="emotion-box" id="emotion-box">Final Emotion: </div>
+            <div class="song-box">
+                <p>Now Playing:</p>
+                <audio id="song-player" controls>
+                    <source src="" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <button class="control-button" id="toggle-button" onclick="toggleDetection()">Stop Detection</button>
+        </div>
+    </div>
+
+    <script>
+        let isDetecting = true;
+
+        function toggleDetection() {
+            if (isDetecting) {
+                stopDetection();
+            } else {
+                startDetection();
+            }
+        }
+
+        function stopDetection() {
+            fetch('/stop', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("emotion-box").innerText = "Final Emotion: " + data.emotion;
+                    playSong(data.song_url);
+                    document.getElementById("toggle-button").innerText = "Start Detection";
+                    document.getElementById("video-feed").src = ""; // Stop video feed
+                    isDetecting = false;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function startDetection() {
+            fetch('/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("toggle-button").innerText = "Stop Detection";
+                    document.getElementById("video-feed").src = "{{ url_for('video_feed') }}"; // Restart video feed
+                    isDetecting = true;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function playSong(songUrl) {
+            document.getElementById("song-player").src = songUrl;
+            document.getElementById("song-player").play();
+        }
+    </script>
+</body>
+</html>

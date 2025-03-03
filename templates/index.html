@@ -122,34 +122,49 @@
             }
         }
 
-        function stopDetection() {
-            fetch('/stop', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("emotion-box").innerText = "Final Emotion: " + data.emotion;
-                    playSong(data.song_url);
-                    document.getElementById("toggle-button").innerText = "Start Detection";
-                    document.getElementById("video-feed").src = ""; // Stop video feed
-                    isDetecting = false;
-                })
-                .catch(error => console.error("Error:", error));
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+    // Ensure the button always shows "Start Detection" on page load
+    document.getElementById("toggle-button").innerText = "Start Detection";
+    isDetecting = false;
+});
 
-        function startDetection() {
-            fetch('/start', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("toggle-button").innerText = "Stop Detection";
-                    document.getElementById("video-feed").src = "{{ url_for('video_feed') }}"; // Restart video feed
-                    isDetecting = true;
-                })
-                .catch(error => console.error("Error:", error));
-        }
+function startDetection() {
+    fetch('/start', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("toggle-button").innerText = "Detecting...";
+            document.getElementById("video-feed").src = "{{ url_for('video_feed') }}"; // Restart video feed
+            isDetecting = true;
 
-        function playSong(songUrl) {
-            document.getElementById("song-player").src = songUrl;
-            document.getElementById("song-player").play();
-        }
+            // Stop detection automatically after 5 seconds
+            setTimeout(() => {
+                stopDetection();
+            }, 5000);
+        })
+        .catch(error => console.error("Error:", error));
+}
+
+function stopDetection() {
+    fetch('/stop', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("emotion-box").innerText = "Final Emotion: " + data.emotion;
+            playSong(data.song_url);
+            document.getElementById("toggle-button").innerText = "Start Detection";
+            document.getElementById("video-feed").src = ""; // Stop video feed
+            isDetecting = false;
+        })
+        .catch(error => console.error("Error:", error));
+}
+
+function playSong(songUrl) {
+    const player = document.getElementById("song-player");
+    player.src = songUrl;
+    player.load();
+    player.play();
+}
+
+
     </script>
 </body>
 </html>
